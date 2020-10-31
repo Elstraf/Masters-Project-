@@ -31,31 +31,42 @@ class StrafBot(sc2.BotAI):
     async def build_pylons(self):
         #Gets the nexus in game 
         nexus = self.townhalls.ready.random
+        #Sets pos to 10 units towards where the enemy starts 
         pos = nexus.position.towards(self.enemy_start_locations[0], 10)
 
         if(
+            #Checks to see if we have less than 3 supplys left
             self.supply_left < 3 
+            #And that we've not already got a pylon pending 
             and self.already_pending(UnitTypeId.PYLON) == 0
+            #And that we can afford to build one
             and self.can_afford(UnitTypeId.PYLON)
         ):
             await self.build(UnitTypeId.PYLON, near = pos)
 
     async def build_gateway(self):
         if(
+            #Check that we have a pylon built
             self.structures(UnitTypeId.PYLON).ready
+            #And that we can afford a gateway
             and self.can_afford(UnitTypeId.GATEWAY)
             and not self.structures(UnitTypeId.GATEWAY)
         ):
+            #Gets a random pylon for its posistion
             pylon = self.structures(UnitTypeId.PYLON).ready.random
+            #Builds the gateway next to the pylon 
             await self.build(UnitTypeId.GATEWAY, near = pylon)
 
     async def build_assimilator(self):
         if self.structures(UnitTypeId.GATEWAY):
             for nexus in self.townhalls.ready:
+                #Finds all the geysers that are closer than 15 units from the nexus
                 vgs = self.vespene_geyser.closer_than(15, nexus)
                 for vg in vgs: 
+                    #Checks to see if we can afford one
                     if not self.can_afford(UnitTypeId.ASSIMILATOR):
                         break
+                    #Sets a worker to build at the geysers position
                     worker = self.select_build_worker(vg.position)
                     if worker is None:
                         break
