@@ -2,6 +2,7 @@ import sc2
 from sc2 import run_game, maps, Race, Difficulty
 from sc2.player import Bot, Computer
 from sc2.ids.unit_typeid import UnitTypeId
+from sc2.ids.ability_id import AbilityId
 
 class StrafBot(sc2.BotAI):
     async def on_step(self, iteration):
@@ -13,6 +14,7 @@ class StrafBot(sc2.BotAI):
         await self.build_cyber_core()
         await self.train_stalkers()
         await self.build_four_gates()
+        await self.chrono()
 
     async def build_workers(self):
         #Gets the nexus in game 
@@ -102,6 +104,17 @@ class StrafBot(sc2.BotAI):
         ):
             pylon = self.structures(UnitTypeId.PYLON).ready.random
             await self.build(UnitTypeId.GATEWAY, near = pylon)
+
+    async def chrono(self):
+        if self.structures(UnitTypeId.PYLON):
+            nexus = self.townhalls.ready.random
+            if(
+                not self.structures(UnitTypeId.CYBERNETICSCORE).ready
+                and self.structures(UnitTypeId.PYLON).amount > 0
+            ):
+                if nexus.energy >= 50:
+                    nexus(AbilityId.EFFECT_CHRONOBOOSTENERGYCOST, nexus)
+
 
 
 
