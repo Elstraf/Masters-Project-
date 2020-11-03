@@ -15,6 +15,7 @@ class StrafBot(sc2.BotAI):
         await self.train_stalkers()
         await self.build_four_gates()
         await self.chrono()
+        await self.attack()
 
     async def build_workers(self):
         #Gets the nexus in game 
@@ -115,12 +116,13 @@ class StrafBot(sc2.BotAI):
                 if nexus.energy >= 50:
                     nexus(AbilityId.EFFECT_CHRONOBOOSTENERGYCOST, nexus)
 
-
-
-
-
+    async def attack(self):
+        if self.units(UnitTypeId.STALKER).amount > 3:
+             for s in self.units(UnitTypeId.STALKER).idle:
+                self.do(s.attack((self.enemy_start_locations[0])))
+            
 
 run_game(maps.get("AbyssalReefLE"),[
     Bot(Race.Protoss, StrafBot()),
     Computer(Race.Terran, Difficulty.Easy)
-    ], realtime = True)
+    ], realtime = False)
