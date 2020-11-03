@@ -39,9 +39,9 @@ class ZergAgent(base_agent.BaseAgent):
             ymean = player_y.mean()
 
             if xmean <= 31 and ymean <= 31:
-                self.attack_coordinates = (49, 49)
-            else:
                 self.attack_coordinates = (12, 16)
+            else:
+                self.attack_coordinates = (49, 49)
 
         zerglings = self.get_units_by_type(obs, units.Zerg.Zergling)
         if len(zerglings) >= 10:
