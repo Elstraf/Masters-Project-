@@ -117,7 +117,7 @@ class StrafBot(sc2.BotAI):
                     nexus(AbilityId.EFFECT_CHRONOBOOSTENERGYCOST, nexus)
 
     async def attack(self):
-        if self.units(UnitTypeId.STALKER).amount > 3:
+        if self.units(UnitTypeId.STALKER).amount > 15:
              for s in self.units(UnitTypeId.STALKER).idle:
                 self.do(s.attack((self.enemy_start_locations[0])))
             
