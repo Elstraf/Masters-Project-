@@ -4,6 +4,8 @@ import numpy
 from pysc2.agents import base_agent
 from pysc2.lib import actions, features, units
 
+from QLearning import QLearningTable 
+
 
 class QLearningAgent(base_agent.BaseAgent):
     #Agent that will beat the minigame with Q Learning
