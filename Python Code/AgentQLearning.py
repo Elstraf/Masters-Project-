@@ -69,8 +69,8 @@ class QLearningAgent(base_agent.BaseAgent):
     def attack(self, obs):
         marines = self.get_my_units_by_type(obs, units.Terran.Marine)
         if len(marines) > 0:
-            roaches = [units for unit in obs.observation.raw_units
-                       if unit.alliance == _PLAYER_ENEMY]
+            roaches =0 #[units for unit in obs.observation.raw_units
+                       #if unit.alliance == _PLAYER_ENEMY]
             distances = self.get_distances(obs, marines, roaches)
             marine = marines[np.argmax(distances)]
 
@@ -85,8 +85,8 @@ class QLearningAgent(base_agent.BaseAgent):
 
     def get_state(self, obs):
         marines = self.get_my_units_by_type(obs, units.Terran.Marine)
-        enemyRoaches = [units for unit in obs.observation.raw_units
-                        if unit.alliance == _PLAYER_ENEMY]
+        enemyRoaches =0#[units for unit in obs.observation.raw_units
+                        #if unit.alliance == _PLAYER_ENEMY]
         
         return(len(marines),
                len(enemyRoaches))
