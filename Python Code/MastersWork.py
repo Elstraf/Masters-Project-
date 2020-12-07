@@ -11,7 +11,11 @@ from pysc2.env import sc2_env, run_loop
 # Basic class that will only make a unit and move it into the middle of the map 
 class Agent(base_agent.BaseAgent):
 
-    actions = ("harvest_minerals")
+    actions = ("harvest_minerals",
+               "build_supply_depot",
+               "build_barracks",
+               "train_marine",
+               "attack")
 
 
     #Get all the players units by type
@@ -113,10 +117,12 @@ class Agent(base_agent.BaseAgent):
             obs, units.Terran.Barracks)
         free_supply = (obs.observation.player.food_cap -
                        obs.observation.player.food_used)
+        numberOfMarine = 0
         if (len(completed_barrackses) > 0 and obs.observation.player.minerals >= 100
-                and free_supply > 0):
+                and free_supply > 0 and numberOfMarine >= 0):
             barracks = self.get_my_units_by_type(obs, units.Terran.Barracks)[0]
             if barracks.order_length <= 1:
+
                 return actions.RAW_FUNCTIONS.Train_Marine_quick("now", barracks.tag)
         return actions.RAW_FUNCTIONS.no_op()
 
@@ -130,7 +136,7 @@ class Agent(base_agent.BaseAgent):
             y_offset = random.randint(-4, 4)
             return actions.RAW_FUNCTIONS.Attack_pt(
                 "now", marine.tag, (attack_xy[0] + x_offset, attack_xy[1] + y_offset))
-        return actions.RAW_FUNCTIONS.no_op()       
+        return actions.RAW_FUNCTIONS.no_op()     
 
 
 class StarterAgent(Agent):
@@ -147,8 +153,7 @@ def main(unused_argv):
         with sc2_env.SC2Env(
             map_name="Simple64",
             players=[sc2_env.Agent(sc2_env.Race.terran),
-                     sc2_env.Bot(sc2_env.Race.terran, 
-                                 sc2_env.Difficulty.very_easy)],
+                     sc2_env.Agent(sc2_env.Race.terran)],
             agent_interface_format=features.AgentInterfaceFormat(
                 action_space=actions.ActionSpace.RAW,
                 use_raw_units=True,
