@@ -7,6 +7,8 @@ from pysc2.lib import units
 from pysc2.lib import features
 
 
+## TO RUN THE AGENT:   python -m pysc2.bin.agent --map DefeatWhatever --agent pysc2.agents.QLearningMiniGame.Agent
+
 def _xy_locs(mask):
     y, x = np.nonzero(mask)
     return list(zip(x, y))
