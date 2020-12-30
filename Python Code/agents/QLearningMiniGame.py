@@ -77,7 +77,7 @@ class Agent(base_agent.BaseAgent):
     def __init__(self):
         super().__init__()
 
-        self.qlearn = QLearningTable(self.smartActions)
+        self.qtable = QLearningTable(self.smartActions)
 
     def attack(self, obs):
 
@@ -114,24 +114,44 @@ class Agent(base_agent.BaseAgent):
         return actions.FUNCTIONS.select_army("select")
 
 
+    def get_state(self, obs):
+        marines = self.get_my_units_by_type(obs, units.Terran.Marine)
+        eneimes = self.get_enemy_units_by_type(obs, units.Zerg.Zergling)
+
+        #player_relative = obs.observation.feature_screen.player_relative
+        #ownUnits = _xy_locs(player_relative == features.PlayerRelative.SELF)
+
+        marinesHealth = features.UnitLayer.health
+
+        #print(marinesHealth)        
+
+        return((len(marines),
+                len(eneimes),
+                marinesHealth))
+
+    def reset(self):
+        super(Agent, self).reset()
+        self.new_game()
+
+    def new_game(self):
+        self.previous_state = None
+        self.previous_action = None
+
 
     def step(self, obs):
         super(Agent, self).step(obs)
+        state = str(self.get_state(obs))
+        action = self.qtable.choose_action(state)
 
-        # Gets all the players units on screen
-        # Since its just one set of units we dont need to check for certain types 
-        #marines = self.get_my_units_by_type(obs, units.Terran.Marine)
-        # Same as above just for the enemy ones
-        #targets = self.get_enemy_units_by_type(obs, units.Zerg.Zergling)
+        if self.previous_action is not None:
+            self.qtable.learn(self.previous_state,
+                              self.previous_action,
+                              obs.reward,
+                              'terminal' if obs.last() else state)
 
-       # marines = [unit.tag for unit in obs.observation.raw_units
-            #    if unit.alliance == features.PlayerRelative.SELF]
-     #   targets = [unit for unit in obs.observation.raw_units
-              #  if unit.alliance == features.PlayerRelative.ENEMY]
-        
-        #return actions.RAW_FUNCTIONS.no_op()
-
-                # select the user units 
+        self.previous_state = state
+        self.previous_action = action
+        return getattr(self, action)(obs)
 
 
         
