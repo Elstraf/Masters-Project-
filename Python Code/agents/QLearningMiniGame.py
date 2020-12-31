@@ -121,13 +121,24 @@ class Agent(base_agent.BaseAgent):
         #player_relative = obs.observation.feature_screen.player_relative
         #ownUnits = _xy_locs(player_relative == features.PlayerRelative.SELF)
 
-        marinesHealth = features.UnitLayer.health
+        #marinesHealth = features.UnitLayer.health
 
+        myUnits = [unit for unit in obs.observation.feature_units
+                 if unit.alliance == features.PlayerRelative.SELF]
+
+        if(len(myUnits) > 0):
+            marine_health = myUnits[0].health
+            #print('Health:' + str(marine_health))
+            return((len(marines),
+                len(eneimes),
+                marine_health))
+                
+        #print('Health:' + str(marine_health))
         #print(marinesHealth)        
 
         return((len(marines),
                 len(eneimes),
-                marinesHealth))
+               ))
 
     def reset(self):
         super(Agent, self).reset()
