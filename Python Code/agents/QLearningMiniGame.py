@@ -1,6 +1,7 @@
 import numpy as np 
 import pandas as pd
 import random 
+import os.path
 
 from pysc2.agents import base_agent
 from pysc2.lib import actions 
@@ -8,7 +9,10 @@ from pysc2.lib import units
 from pysc2.lib import features
 
 
-## TO RUN THE AGENT:   python -m pysc2.bin.agent --map DefeatWhatever --agent pysc2.agents.QLearningMiniGame.Agent
+## TO RUN THE AGENT:   python -m pysc2.bin.agent --map DefeatWhatever --agent pysc2.agents.QLearningMiniGame.Agent --use_raw_units --use_feature_units
+
+DATA_FILE = 'qlearning_agent_data'
+
 
 def _xy_locs(mask):
     y, x = np.nonzero(mask)
@@ -79,6 +83,9 @@ class Agent(base_agent.BaseAgent):
 
         self.qtable = QLearningTable(self.smartActions)
 
+        if os.path.isfile(DATA_FILE + '.gz'):
+            self.qtable.q_table = pd.read_pickle(DATA_FILE + '.gz', compression='gzip')
+
     def attack(self, obs):
 
         if actions.FUNCTIONS.Attack_screen.id in obs.observation.available_actions:
@@ -145,6 +152,7 @@ class Agent(base_agent.BaseAgent):
         self.new_game()
 
     def new_game(self):
+        self.qtable.q_table.to_pickle(DATA_FILE + '.gz', 'gzip')
         self.previous_state = None
         self.previous_action = None
 
