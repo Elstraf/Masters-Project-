@@ -10,6 +10,7 @@ from pysc2.lib import features
 
 
 ## TO RUN THE AGENT:   python -m pysc2.bin.agent --map DefeatWhatever --agent pysc2.agents.QLearningMiniGame.Agent --use_raw_units --use_feature_units
+# python -m pysc2.bin.agent --map DefeatWhatever --agent pysc2.agents.QLearningMiniGame.Agent --use_raw_units --use_feature_units --max_episodes 1000
 
 DATA_FILE = 'qlearning_agent_data'
 
@@ -152,7 +153,6 @@ class Agent(base_agent.BaseAgent):
         self.new_game()
 
     def new_game(self):
-        self.qtable.q_table.to_pickle(DATA_FILE + '.gz', 'gzip')
         self.previous_state = None
         self.previous_action = None
 
@@ -167,6 +167,8 @@ class Agent(base_agent.BaseAgent):
                               self.previous_action,
                               obs.reward,
                               'terminal' if obs.last() else state)
+            
+        self.qtable.q_table.to_pickle(DATA_FILE + '.gz', 'gzip')
 
         self.previous_state = state
         self.previous_action = action
