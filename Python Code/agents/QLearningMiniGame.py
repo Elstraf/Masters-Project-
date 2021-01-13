@@ -114,7 +114,16 @@ class Agent(base_agent.BaseAgent):
             if not enemies:
                 return actions.FUNCTIONS.no_op()
             
-            moveAway = (random.randint(0, 100), random.randint(0,100))         
+            distance = 5
+
+
+            myUnits = [unit for unit in obs.observation.feature_units
+                 if unit.alliance == features.PlayerRelative.SELF]
+            if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
+                return actions.FUNCTIONS.no_op()
+            else:
+                moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)         
+
 
             return actions.FUNCTIONS.Move_screen("now", moveAway)
 
@@ -123,26 +132,36 @@ class Agent(base_agent.BaseAgent):
 
 
     def get_state(self, obs):
+
+        #Get all the agents and enemies units 
         marines = self.get_my_units_by_type(obs, units.Terran.Marine)
         eneimes = self.get_enemy_units_by_type(obs, units.Zerg.Zergling)
 
-        #player_relative = obs.observation.feature_screen.player_relative
-        #ownUnits = _xy_locs(player_relative == features.PlayerRelative.SELF)
-
-        #marinesHealth = features.UnitLayer.health
-
+        # Loops through all the units that can be seen and if they're friendly add them to the array 
         myUnits = [unit for unit in obs.observation.feature_units
                  if unit.alliance == features.PlayerRelative.SELF]
 
+        # Check to see if there is a player alive 
         if(len(myUnits) > 0):
             marine_health = myUnits[0].health
-            #print('Health:' + str(marine_health))
+            #return the hp of the agents unit
             return((len(marines),
                 len(eneimes),
                 marine_health))
-                
-        #print('Health:' + str(marine_health))
-        #print(marinesHealth)        
+
+        enemyUnits = [unit for unit in obs.observation.feature_units
+                    if unit.alliance == features.PlayerRelative.ENEMY]
+
+        # Check to see if there is a player alive 
+        if(len(myUnits) > 0 and len(enemyUnits) > 0):
+            marine_health = myUnits[0].health
+            enemy_health = enemyUnits[0].health
+            #return the hp of the agents unit
+            return((len(marines),
+                len(eneimes),
+                marine_health,
+                enemy_health
+                ))
 
         return((len(marines),
                 len(eneimes),
