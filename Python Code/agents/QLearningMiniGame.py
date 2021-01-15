@@ -115,19 +115,17 @@ class Agent(base_agent.BaseAgent):
             
             distance = 2
 
-            if enemies and player_relative:
-                myUnits = [unit for unit in obs.observation.feature_units
-                    if unit.alliance == features.PlayerRelative.SELF]
-                enemyUnits = [units for unit in obs.observation.feature_units
-                    if unit.alliance == features.PlayerRelative.ENEMY]
+            myUnits = [unit for unit in obs.observation.feature_units
+                if unit.alliance == features.PlayerRelative.SELF]
+            enemyUnits = [unit for unit in obs.observation.feature_units
+                if unit.alliance == features.PlayerRelative.ENEMY]
 
-                distanceBetween = math.hypot(myUnits[0].x - enemyUnits[0].x, myUnits[0].y - enemyUnits[0].y)
+            distanceBetween = math.hypot(myUnits[0].x - enemyUnits[0].x, myUnits[0].y - enemyUnits[0].y)
 
-                if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
-                    return actions.FUNCTIONS.no_op()
+            if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
+                return actions.FUNCTIONS.no_op()
 
-                if distanceBetween <= distance:
-                    moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)
+            moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)
                 
                 #if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
                     #return actions.FUNCTIONS.no_op()
@@ -135,7 +133,7 @@ class Agent(base_agent.BaseAgent):
                     #moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)         
 
 
-                return actions.FUNCTIONS.Move_screen("now", moveAway)
+            return actions.FUNCTIONS.Move_screen("now", moveAway)
 
 
         return actions.FUNCTIONS.select_army("select")
