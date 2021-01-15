@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import random 
 import os.path
+import math
 
 from pysc2.agents import base_agent
 from pysc2.lib import actions 
@@ -60,8 +61,6 @@ class Agent(base_agent.BaseAgent):
         "retreat",
         "attack"
     ]
-
-
     # Gets all the players units by unit type
     def get_my_units_by_type(self, obs, unit_type):
         return [unit for unit in obs.observation.raw_units
@@ -114,22 +113,32 @@ class Agent(base_agent.BaseAgent):
             if not enemies:
                 return actions.FUNCTIONS.no_op()
             
-            distance = 5
+            distance = 2
+
+            if enemies and player_relative:
+                myUnits = [unit for unit in obs.observation.feature_units
+                    if unit.alliance == features.PlayerRelative.SELF]
+                enemyUnits = [units for unit in obs.observation.feature_units
+                    if unit.alliance == features.PlayerRelative.ENEMY]
+
+                distanceBetween = math.hypot(myUnits[0].x - enemyUnits[0].x, myUnits[0].y - enemyUnits[0].y)
+
+                if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
+                    return actions.FUNCTIONS.no_op()
+
+                if distanceBetween <= distance:
+                    moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)
+                
+                #if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
+                    #return actions.FUNCTIONS.no_op()
+                #else:
+                    #moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)         
 
 
-            myUnits = [unit for unit in obs.observation.feature_units
-                 if unit.alliance == features.PlayerRelative.SELF]
-            if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
-                return actions.FUNCTIONS.no_op()
-            else:
-                moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)         
-
-
-            return actions.FUNCTIONS.Move_screen("now", moveAway)
+                return actions.FUNCTIONS.Move_screen("now", moveAway)
 
 
         return actions.FUNCTIONS.select_army("select")
-
 
     def get_state(self, obs):
 
@@ -180,6 +189,7 @@ class Agent(base_agent.BaseAgent):
         super(Agent, self).step(obs)
         state = str(self.get_state(obs))
         action = self.qtable.choose_action(state)
+
 
         if self.previous_action is not None:
             self.qtable.learn(self.previous_state,
