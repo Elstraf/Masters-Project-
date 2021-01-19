@@ -125,7 +125,8 @@ class Agent(base_agent.BaseAgent):
             if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
                 return actions.FUNCTIONS.no_op()
 
-            moveAway = (myUnits[0].x - distance, myUnits[0].y - distance)
+
+            moveAway = (myUnits[0].x - distance, myUnits[0].y)
                 
                 #if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
                     #return actions.FUNCTIONS.no_op()
@@ -141,7 +142,7 @@ class Agent(base_agent.BaseAgent):
     def get_state(self, obs):
 
         #Get all the agents and enemies units 
-        marines = self.get_my_units_by_type(obs, units.Terran.Marine)
+        reaper = self.get_my_units_by_type(obs, units.Terran.Reaper)
         eneimes = self.get_enemy_units_by_type(obs, units.Zerg.Zergling)
 
         # Loops through all the units that can be seen and if they're friendly add them to the array 
@@ -150,27 +151,27 @@ class Agent(base_agent.BaseAgent):
 
         # Check to see if there is a player alive 
         if(len(myUnits) > 0):
-            marine_health = myUnits[0].health
+            reaper_health = myUnits[0].health
             #return the hp of the agents unit
-            return((len(marines),
+            return((len(reaper),
                 len(eneimes),
-                marine_health))
+                reaper_health))
 
         enemyUnits = [unit for unit in obs.observation.feature_units
                     if unit.alliance == features.PlayerRelative.ENEMY]
 
         # Check to see if there is a player alive 
         if(len(myUnits) > 0 and len(enemyUnits) > 0):
-            marine_health = myUnits[0].health
+            reaper_health = myUnits[0].health
             enemy_health = enemyUnits[0].health
             #return the hp of the agents unit
-            return((len(marines),
+            return((len(reaper),
                 len(eneimes),
-                marine_health,
+                reaper_health,
                 enemy_health
                 ))
 
-        return((len(marines),
+        return((len(reaper),
                 len(eneimes),
                ))
 
