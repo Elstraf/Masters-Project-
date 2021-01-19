@@ -86,6 +86,8 @@ class Agent(base_agent.BaseAgent):
         if os.path.isfile(DATA_FILE + '.gz'):
             self.qtable.q_table = pd.read_pickle(DATA_FILE + '.gz', compression='gzip')
 
+        df1 = pd.DataFrame([])
+
     def attack(self, obs):
 
         if actions.FUNCTIONS.Attack_screen.id in obs.observation.available_actions:
@@ -150,12 +152,12 @@ class Agent(base_agent.BaseAgent):
                  if unit.alliance == features.PlayerRelative.SELF]
 
         # Check to see if there is a player alive 
-        if(len(myUnits) > 0):
-            reaper_health = myUnits[0].health
+        #if(len(myUnits) > 0):
+            #reaper_health = myUnits[0].health
             #return the hp of the agents unit
-            return((len(reaper),
-                len(eneimes),
-                reaper_health))
+            #return((len(reaper),
+                #len(eneimes),
+                #reaper_health))
 
         enemyUnits = [unit for unit in obs.observation.feature_units
                     if unit.alliance == features.PlayerRelative.ENEMY]
@@ -168,7 +170,10 @@ class Agent(base_agent.BaseAgent):
             return((len(reaper),
                 len(eneimes),
                 reaper_health,
-                enemy_health
+                enemy_health,
+                myUnits[0].weapon_cooldown,
+                myUnits[0].radius,
+                eneimes[0].radius
                 ))
 
         return((len(reaper),
@@ -195,11 +200,11 @@ class Agent(base_agent.BaseAgent):
                               self.previous_action,
                               obs.reward,
                               'terminal' if obs.last() else state)
-            
-        self.qtable.q_table.to_pickle(DATA_FILE + '.gz', 'gzip')
 
         self.previous_state = state
         self.previous_action = action
+
+        self.qtable.q_table.to_pickle(DATA_FILE + '.gz', 'gzip')
         return getattr(self, action)(obs)
 
 
