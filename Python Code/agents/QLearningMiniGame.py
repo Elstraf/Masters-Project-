@@ -86,8 +86,6 @@ class Agent(base_agent.BaseAgent):
         if os.path.isfile(DATA_FILE + '.gz'):
             self.qtable.q_table = pd.read_pickle(DATA_FILE + '.gz', compression='gzip')
 
-        df1 = pd.DataFrame([])
-
     def attack(self, obs):
 
         if actions.FUNCTIONS.Attack_screen.id in obs.observation.available_actions:
@@ -96,6 +94,17 @@ class Agent(base_agent.BaseAgent):
 
             if not targets:
                 return actions.FUNCTIONS.no_op()
+                
+
+            myUnits = [unit for unit in obs.observation.feature_units
+                if unit.alliance == features.PlayerRelative.SELF]
+            enemyUnits = [unit for unit in obs.observation.feature_units
+                if unit.alliance == features.PlayerRelative.ENEMY]
+
+            distanceBetween = math.hypot(myUnits[0].x - enemyUnits[0].x, myUnits[0].y - enemyUnits[0].y) 
+
+            if enemyUnits[0].radius >= distanceBetween:
+                return actions.FUNCTIONS.no_op()                
 
             target = targets[np.argmax(np.array(targets)[:, 1])]
             return actions.FUNCTIONS.Attack_screen("now", target)
@@ -125,10 +134,9 @@ class Agent(base_agent.BaseAgent):
             distanceBetween = math.hypot(myUnits[0].x - enemyUnits[0].x, myUnits[0].y - enemyUnits[0].y)
 
             if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
-                return actions.FUNCTIONS.no_op()
-
-
-            moveAway = (myUnits[0].x - distance, myUnits[0].y)
+                moveAway = (myUnits[0].x + distance, myUnits[0].y)
+            else:
+                moveAway = (myUnits[0].x - distance, myUnits[0].y)
                 
                 #if(myUnits[0].x - distance <= 0 or myUnits[0].y - distance <= 0):
                     #return actions.FUNCTIONS.no_op()
@@ -194,6 +202,7 @@ class Agent(base_agent.BaseAgent):
         state = str(self.get_state(obs))
         action = self.qtable.choose_action(state)
 
+        #self.qtable.q_table.to_pickle(DATA_FILE + '.gz', 'gzip')
 
         if self.previous_action is not None:
             self.qtable.learn(self.previous_state,
@@ -206,6 +215,3 @@ class Agent(base_agent.BaseAgent):
 
         self.qtable.q_table.to_pickle(DATA_FILE + '.gz', 'gzip')
         return getattr(self, action)(obs)
-
-
-        
